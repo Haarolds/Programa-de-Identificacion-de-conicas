@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Identificador de Cónicas</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #eaf4ff;
+      animation: fadeIn 1s ease-in;
+    }
+
+    .pagina {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem;
+      gap: 2rem;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .contenedor {
+      background-color: #f0f4ff;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+      animation: slideIn 1s ease-out;
+    }
+
+    h1 {
+      color: #9370db;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .fila {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 1rem;
+    }
+
+    .campo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 60px;
+    }
+
+    .campo label {
+      color: #9370db;
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+    }
+
+    input {
+      width: 50px;
+      padding: 0.4rem;
+      border: 2px solid #b3d4fc;
+      border-radius: 10px;
+      text-align: center;
+      background: #e0f0ff;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: #7fbfff;
+      background: #f0f8ff;
+    }
+
+    .botones {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    button {
+      background-color: #a6d1ff;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #444;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #87c3ff;
+    }
+
+    .ejemplos {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .ejemplos h3 {
+      color: #9370db;
+      margin-bottom: 0.5rem;
+    }
+
+    .botones-ejemplo button {
+      background-color: #ccf5f5;
+      margin: 0.2rem;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .botones-ejemplo button:hover {
+      background-color: #b2e6e6;
+    }
+
+    .resultado {
+      margin-top: 1rem;
+      text-align: center;
+      font-weight: bold;
+      color: #5e5ea0;
+      white-space: pre-wrap;
+      min-height: 3rem;
+    }
+
+    .grafica {
+      width: 800px;
+      height: 550px;
+      border-radius: 20px;
+      background: white;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      animation: slideIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="pagina">
+    <div class="contenedor">
+      <h1>Identificador de Cónicas</h1>
+      <h4>Creado por: Harold Lugmaña 2 do "A" Informatica</h4>
+      <form id="formulario">
+        <div class="fila">
+          <div class="campo"><label>A</label><input type="number" id="a" required /></div>
+          <div class="campo"><label>B</label><input type="number" id="b" required /></div>
+          <div class="campo"><label>C</label><input type="number" id="c" required /></div>
+        </div>
+        <div class="fila">
+          <div class="campo"><label>D</label><input type="number" id="d" required /></div>
+          <div class="campo"><label>E</label><input type="number" id="e" required /></div>
+          <div class="campo"><label>F</label><input type="number" id="f" required /></div>
+        </div>
+        <div class="botones">
+          <button type="submit">Identificar</button>
+          <button type="button" id="graficar">Graficar</button>
+          <button type="button" id="limpiar">Limpiar</button>
+        </div>
+        <div class="ejemplos">
+          <h3>Ejemplos rápidos:</h3>
+          <div class="botones-ejemplo">
+            <button type="button" onclick="usarEjemplo('circunferencia')">Circunferencia</button>
+            <button type="button" onclick="usarEjemplo('elipse')">Elipse</button>
+            <button type="button" onclick="usarEjemplo('parabolaH')">Parábola H</button>
+            <button type="button" onclick="usarEjemplo('parabolaV')">Parábola V</button>
+            <button type="button" onclick="usarEjemplo('hiperbola')">Hipérbola</button>
+            <button type="button" onclick="usarEjemplo('hiperbolaRot')">Hipérbola xy</button>
+          </div>
+        </div>
+        <div id="resultado" class="resultado"></div>
+      </form>
+    </div>
+    <div class="grafica" id="grafica"></div>
+  </div>
+
+  <script src="https://www.desmos.com/api/v1.6/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+  <script>
+    var grafica = document.getElementById('grafica')
+    var calculator
+
+    window.addEventListener('load', function () {
+      calculator = Desmos.GraphingCalculator(grafica, {
+        expressions: false,
+        zoomButtons: true,
+        settingsMenu: false,
+        border: false
+      })
+    })
+
+    function construirEcuacion(a, b, c, d, e, f) {
+      var ecuacion = ''
+      if (a) ecuacion += a + 'x^2 + '
+      if (b) ecuacion += b + 'xy + '
+      if (c) ecuacion += c + 'y^2 + '
+      if (d) ecuacion += d + 'x + '
+      if (e) ecuacion += e + 'y + '
+      if (f) ecuacion += f
+      return ecuacion.replace(/\+\s*$/, '') + ' = 0'
+    }
+
+    document.getElementById('formulario').addEventListener('submit', function (e) {
+      e.preventDefault()
+
+      var a = parseFloat(document.getElementById('a').value)
+      var b = parseFloat(document.getElementById('b').value)
+      var c = parseFloat(document.getElementById('c').value)
+      var d = parseFloat(document.getElementById('d').value)
+      var e_ = parseFloat(document.getElementById('e').value)
+      var f = parseFloat(document.getElementById('f').value)
+
+      var disc = b * b - 4 * a * c
+      var tipo = ''
+      var orient = ''
+
+      if (b == 0 && a == c && a != 0) {
+        tipo = 'Circunferencia'
+        orient = 'simétrica en ambos ejes'
+      } else if (disc < 0) {
+        tipo = 'Elipse'
+        orient = a > c ? 'más alargada en eje X' : 'más alargada en eje Y'
+      } else if (disc == 0) {
+        tipo = 'Parábola'
+        if (a == 0 && c != 0) orient = 'vertical'
+        else if (c == 0 && a != 0) orient = 'horizontal'
+        else orient = 'inclinada'
+      } else if (disc > 0) {
+        tipo = 'Hipérbola'
+        orient = a * c < 0 ? 'ejes cruzados' : 'rotada o inclinada'
+      } else {
+        tipo = 'Indefinida'
+      }
+
+      var resultado = 'Tipo de cónica: ' + tipo + '\nDiscriminante: ' + disc + '\nOrientación: ' + orient
+      document.getElementById('resultado').textContent = resultado
+    })
+
+    document.getElementById('graficar').addEventListener('click', function () {
+      var a = parseFloat(document.getElementById('a').value)
+      var b = parseFloat(document.getElementById('b').value)
+      var c = parseFloat(document.getElementById('c').value)
+      var d = parseFloat(document.getElementById('d').value)
+      var e = parseFloat(document.getElementById('e').value)
+      var f = parseFloat(document.getElementById('f').value)
+
+      var eq = construirEcuacion(a, b, c, d, e, f)
+      calculator.setExpression({ id: 'conica', latex: eq })
+    })
+
+    function usarEjemplo(nombre) {
+      var ejemplos = {
+        circunferencia: [1, 0, 1, 0, 0, -9],
+        elipse: [4, 0, 1, 0, 0, -16],
+        parabolaH: [1, 0, 0, -4, 0, 0],
+        parabolaV: [0, 0, 1, 0, -4, 0],
+        hiperbola: [1, 0, -1, 0, 0, -1],
+        hiperbolaRot: [0, 1, 0, 0, 0, -1]
+      }
+
+      var valores = ejemplos[nombre]
+
+      document.getElementById('a').value = valores[0]
+      document.getElementById('b').value = valores[1]
+      document.getElementById('c').value = valores[2]
+      document.getElementById('d').value = valores[3]
+      document.getElementById('e').value = valores[4]
+      document.getElementById('f').value = valores[5]
+
+      document.getElementById('formulario').dispatchEvent(new Event('submit'))
+    }
+
+    document.getElementById('limpiar').addEventListener('click', function () {
+      document.getElementById('a').value = ''
+      document.getElementById('b').value = ''
+      document.getElementById('c').value = ''
+      document.getElementById('d').value = ''
+      document.getElementById('e').value = ''
+      document.getElementById('f').value = ''
+      document.getElementById('resultado').textContent = ''
+      calculator.setExpressions([]) // limpia la gráfica
+    })
+  </script>
